@@ -69,9 +69,27 @@ export default function App() {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       cookiesEnabled: navigator.cookieEnabled ? "有効 (Enabled)" : "無効 (Disabled)",
       referrer: document.referrer || "直接アクセス / ブックマーク (Direct)",
-      browserName: ua.indexOf("Edg/") !== -1 ? "Microsoft Edge" : ua.indexOf("Chrome/") !== -1 ? "Google Chrome" : ua.indexOf("Firefox/") !== -1 ? "Firefox" : ua.indexOf("Safari/") !== -1 ? "Safari" : "不明なブラウザ"
+      browserName: ua.indexOf("Edg/") !== -1 ? "Microsoft Edge" : ua.indexOf("Chrome/") !== -1 ? "Google Chrome" : ua.indexOf("Firefox/") !== -1 ? "Firefox" : ua.indexOf("Safari/") !== -1 ? "Safari" : "不明なブラウザ",
+      // Add requested scary server info
+      remoteHost: "ocn-v6-dynamic-ppp-122-215-xxx.jp.tokyo.mesh.ad.jp",
+      remoteAddr: billingData.ip,
+      httpReferer: document.referrer || "https://sns-shady-ad-network.com/click?id=882",
+      httpAcceptEncoding: "gzip, deflate, br, zstd",
+      httpAccept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+      httpAcceptLanguage: "ja,en-US;q=0.9,en;q=0.8",
+      httpUserAgent: navigator.userAgent,
+      httpHost: "premium-video-neo.jp",
+      httpConnection: "keep-alive",
+      httpSecFetchSite: "same-origin",
+      httpSecChUaMobile: "?0",
+      httpUpgradeInsecureRequests: "1",
+      httpSecFetchMode: "navigate",
+      httpSecFetchDest: "document",
+      httpSecFetchUser: "?1",
+      httpSecChUaPlatform: `"${os.split(' ')[0]}"`,
+      httpSecChUa: '"Google Chrome";v="125", "Chromium";v="125", "Not.A/Brand";v="24"'
     });
-  }, []);
+  }, [billingData.ip]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -91,7 +109,7 @@ export default function App() {
   const handlePaymentClick = () => {
     const newCount = paymentClickCount + 1;
     setPaymentClickCount(newCount);
-    if (newCount >= 3) {
+    if (newCount >= 2) {
       setStage("REFLECTION");
     } else {
       alert("※デモ画面です。実際にお金は払わないでください。冷静になって、あと少しクリックしてみましょう。");
@@ -488,6 +506,55 @@ export default function App() {
                     <div className="space-y-1.5">
                       <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">言語 / Cookie</p>
                       <p className="text-slate-400 text-base">{systemInfo.language} / {systemInfo.cookiesEnabled}</p>
+                    </div>
+
+                    <div className="sm:col-span-2 mt-4 space-y-4">
+                      <div className="bg-black/80 p-6 rounded-xl border border-red-900/30 font-mono text-[9px] text-slate-400 overflow-x-auto leading-relaxed">
+                        <p className="text-red-500 font-black mb-3 text-xs border-b border-red-900/40 pb-1">SERVER_ENVIRONMENT_DUMP</p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">REMOTE_HOST:</span>
+                             <span className="text-amber-100/60 break-all">{systemInfo.remoteHost}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">REMOTE_ADDR:</span>
+                             <span className="text-amber-200 font-bold">{systemInfo.remoteAddr}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_REFERER:</span>
+                             <span className="text-slate-500 break-all">{systemInfo.httpReferer}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_HOST:</span>
+                             <span className="text-slate-500">{systemInfo.httpHost}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_USER_AGENT:</span>
+                             <span className="text-slate-500 italic break-all">{systemInfo.httpUserAgent}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_ACCEPT_LANGUAGE:</span>
+                             <span className="text-slate-500">{systemInfo.httpAcceptLanguage}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_CH_UA:</span>
+                             <span className="text-slate-500">{systemInfo.httpSecChUa}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_CH_UA_PLATFORM:</span>
+                             <span className="text-slate-500">{systemInfo.httpSecChUaPlatform}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_FETCH_SITE:</span>
+                             <span className="text-slate-500">{systemInfo.httpSecFetchSite}</span>
+                          </div>
+                          <div className="flex gap-2">
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_UPGRADE_INSECURE:</span>
+                             <span className="text-slate-500">{systemInfo.httpUpgradeInsecureRequests}</span>
+                          </div>
+                        </div>
+                        <p className="mt-4 text-[8px] text-red-500/50 italic font-bold">※これらのヘッダー情報は、あなたがサイトにアクセスした瞬間に自動的に送信され、ログに記録されています。</p>
+                      </div>
                     </div>
                   </div>
 
