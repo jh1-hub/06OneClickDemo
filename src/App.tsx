@@ -21,7 +21,7 @@ import {
   ArrowRightCircle
 } from "lucide-react";
 
-type Stage = "PORTAL" | "PLAYBACK" | "BILLING" | "REFLECTION";
+type Stage = "PORTAL" | "PLAYBACK" | "PROCESSING" | "BILLING" | "REFLECTION";
 
 export default function App() {
   const [stage, setStage] = useState<Stage>("PORTAL");
@@ -29,6 +29,7 @@ export default function App() {
   const [showConfirmBox, setShowConfirmBox] = useState(false);
   const [paymentClickCount, setPaymentClickCount] = useState(0);
   const [timer, setTimer] = useState(3 * 24 * 60 * 60);
+  const [processingProgress, setProcessingProgress] = useState(0);
 
   // Fix billing info so it doesn't change once generated
   const billingData = useMemo(() => ({
@@ -98,12 +99,36 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Artificial Delay Logic for Stage PROCESSING
+  useEffect(() => {
+    if (stage === "PROCESSING") {
+      const duration = 2800; // 2.8 seconds
+      const startTime = Date.now();
+      
+      const updateInterval = setInterval(() => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min((elapsed / duration) * 100, 100);
+        setProcessingProgress(progress);
+        
+        if (progress >= 100) {
+          clearInterval(updateInterval);
+          setStage("BILLING");
+        }
+      }, 50);
+      
+      return () => clearInterval(updateInterval);
+    }
+  }, [stage]);
+
   const formatTimer = (seconds: number) => {
     const d = Math.floor(seconds / (24 * 3600));
     const h = Math.floor((seconds % (24 * 3600)) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = seconds % 60;
-    return `${d}日 ${h}時間 ${m}分 ${s}秒`;
+    return {
+      full: `${d}日 ${h}時間 ${m}分 ${s}秒`,
+      hms: `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
+    };
   };
 
   const handlePaymentClick = () => {
@@ -403,7 +428,10 @@ export default function App() {
                     </p>
                     <div className="flex flex-col gap-3">
                       <button 
-                        onClick={() => setStage("BILLING")}
+                        onClick={() => {
+                          setShowConfirmBox(false);
+                          setStage("PROCESSING");
+                        }}
                         className="bg-pink-600 hover:bg-pink-500 text-white font-black py-4 rounded-md transition-all active:scale-[0.98]"
                       >
                         はい、同意して再生する
@@ -419,6 +447,47 @@ export default function App() {
                 </div>
               )}
             </AnimatePresence>
+          </motion.div>
+        )}
+
+        {stage === "PROCESSING" && (
+          <motion.div
+            key="processing"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 flex flex-col items-center justify-center p-4 bg-[#050507] z-[600]"
+          >
+             <div className="max-w-md w-full space-y-8">
+                <div className="text-center space-y-4">
+                   <motion.div
+                     animate={{ rotate: 360 }}
+                     transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+                     className="inline-block w-12 h-12 border-4 border-pink-600 border-t-transparent rounded-full"
+                   />
+                   <h2 className="text-xl font-black text-white tracking-widest animate-pulse">端末情報を照合中...</h2>
+                </div>
+
+                <div className="bg-black border border-slate-800 p-6 rounded-lg space-y-4">
+                   <div className="flex justify-between items-end mb-2">
+                      <span className="text-[10px] font-mono text-slate-500">SYSTEM_EXTRACTION_LINK</span>
+                      <span className="text-xs font-mono text-pink-500">{Math.floor(processingProgress)}%</span>
+                   </div>
+                   <div className="h-1 bg-slate-900 rounded-full overflow-hidden">
+                      <motion.div 
+                        initial={{ width: 0 }}
+                        animate={{ width: `${processingProgress}%` }}
+                        className="h-full bg-pink-600"
+                      />
+                   </div>
+                   <div className="bg-black/50 p-3 font-mono text-[9px] text-slate-400 space-y-1">
+                      <p className="flex justify-between"><span>&gt; Fetching IP:</span> <span className="text-amber-500">{billingData.ip}</span></p>
+                      <p className="flex justify-between"><span>&gt; Fingerprinting OS:</span> <span className="text-indigo-400">{systemInfo.platform}</span></p>
+                      <p className="flex justify-between"><span>&gt; Tracking Referral:</span> <span className="text-slate-500 truncate">{systemInfo.httpHost}</span></p>
+                      <p className="flex justify-between"><span>&gt; Saving Cloud Evidence:</span> <span className="text-green-500">READY</span></p>
+                   </div>
+                </div>
+             </div>
           </motion.div>
         )}
 
@@ -461,8 +530,24 @@ export default function App() {
                   <div className="text-6xl md:text-7xl font-black text-white flex items-baseline justify-center gap-2 group">
                     <span className="text-3xl text-pink-600">￥</span>98,000 <span className="text-sm text-slate-500 font-normal self-end mb-3">(税込)</span>
                   </div>
-                  <div className="inline-flex items-center gap-3 mt-6 bg-red-600/20 text-red-500 text-xs font-black px-6 py-2 rounded-full border border-red-900/50 animate-pulse">
-                    <Clock size={14} /> 支払い期限残り：{formatTimer(timer).split(' ')[1]} {formatTimer(timer).split(' ')[2]}
+                  
+                  {/* Aggressive Deadline Emphasis */}
+                  <div className="mt-8 space-y-3">
+                    <div className="h-2 w-full bg-slate-900 rounded-full overflow-hidden">
+                       <motion.div 
+                         initial={{ width: "100%" }}
+                         animate={{ width: "0%" }}
+                         transition={{ duration: 3 * 24 * 60 * 60, ease: "linear" }}
+                         className="h-full bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.5)]"
+                       />
+                    </div>
+                    <div className="flex flex-col items-center">
+                       <p className="text-red-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">支払い期限残り (Time Remaining)</p>
+                       <p className="text-3xl md:text-5xl font-mono font-black text-red-600 tabular-nums tracking-wider drop-shadow-[0_0_10px_rgba(220,38,38,0.3)] animate-pulse">
+                         {formatTimer(timer).hms}
+                       </p>
+                       <p className="text-[10px] text-slate-500 mt-2 font-bold">{formatTimer(timer).full}</p>
+                    </div>
                   </div>
                 </div>
 
@@ -501,11 +586,11 @@ export default function App() {
                     </div>
                     <div className="space-y-1.5">
                       <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">画面解像度</p>
-                      <p className="text-slate-400 text-base">{systemInfo.screenRes} ({systemInfo.colorDepth})</p>
+                      <p className="text-slate-400 text-base">{systemInfo.screenRes}</p>
                     </div>
                     <div className="space-y-1.5">
-                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">言語 / Cookie</p>
-                      <p className="text-slate-400 text-base">{systemInfo.language} / {systemInfo.cookiesEnabled}</p>
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">Cookieステータス</p>
+                      <p className="text-slate-400 text-base">{systemInfo.cookiesEnabled}</p>
                     </div>
 
                     <div className="sm:col-span-2 mt-4 space-y-4">
@@ -518,48 +603,32 @@ export default function App() {
                           </div>
                           <div className="flex gap-2">
                              <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">REMOTE_ADDR:</span>
-                             <span className="text-amber-200 font-bold">{systemInfo.remoteAddr}</span>
+                             <span className="text-amber-200 font-bold">{billingData.ip}</span>
                           </div>
                           <div className="flex gap-2">
                              <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_REFERER:</span>
                              <span className="text-slate-500 break-all">{systemInfo.httpReferer}</span>
                           </div>
                           <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_HOST:</span>
-                             <span className="text-slate-500">{systemInfo.httpHost}</span>
-                          </div>
-                          <div className="flex gap-2">
                              <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_USER_AGENT:</span>
-                             <span className="text-slate-500 italic break-all">{systemInfo.httpUserAgent}</span>
+                             <span className="text-slate-500 italic break-all truncate">{systemInfo.httpUserAgent}</span>
                           </div>
                           <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_ACCEPT_LANGUAGE:</span>
+                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_ACCEPT_LANG:</span>
                              <span className="text-slate-500">{systemInfo.httpAcceptLanguage}</span>
                           </div>
                           <div className="flex gap-2">
                              <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_CH_UA:</span>
                              <span className="text-slate-500">{systemInfo.httpSecChUa}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_CH_UA_PLATFORM:</span>
-                             <span className="text-slate-500">{systemInfo.httpSecChUaPlatform}</span>
-                          </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_FETCH_SITE:</span>
-                             <span className="text-slate-500">{systemInfo.httpSecFetchSite}</span>
-                          </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_UPGRADE_INSECURE:</span>
-                             <span className="text-slate-500">{systemInfo.httpUpgradeInsecureRequests}</span>
-                          </div>
                         </div>
-                        <p className="mt-4 text-[8px] text-red-500/50 italic font-bold">※これらのヘッダー情報は、あなたがサイトにアクセスした瞬間に自動的に送信され、ログに記録されています。</p>
+                        <p className="mt-4 text-[8px] text-red-500/50 italic font-bold">※これらのヘッダー情報は、サーバーとの接続時に自動的にログへ記録されています。</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-red-950/60 p-5 rounded-xl text-xs text-red-400 font-bold border border-red-900/60 leading-relaxed shadow-lg">
-                    【警告】当サイトは「電子消費者契約法」に基づき、上記情報を法的手続き（プロバイダへの開示請求および住所特定）の証拠として即時にクラウドサーバーへ保存しました。
+                    【警告】当サイトは「電子消費者契約法」に基づき、上記情報を法的手続き（プロバイダへの開示請求および住所特定）の証拠として即時に保存しました。
                   </div>
                 </div>
 
@@ -570,11 +639,11 @@ export default function App() {
                     onClick={handlePaymentClick}
                   >
                     <span>お支払い手続きへ進む</span>
-                    <span className="text-xs font-normal opacity-60">※期限超過後、延滞金および事務手数料が加算されます</span>
+                    <span className="text-xs font-normal opacity-60">※期限超過後、事務手数料加算の対象となります</span>
                   </motion.button>
                   <div className="flex justify-center items-center gap-4 py-4 bg-slate-900/30 rounded-xl">
                      <Clock size={20} className="text-pink-600 animate-pulse" />
-                     <span className="text-sm font-mono font-black text-pink-100 uppercase tracking-widest">支払い期限: {formatTimer(timer)}</span>
+                     <span className="text-sm font-mono font-black text-pink-100 uppercase tracking-widest">最終支払い期限: {formatTimer(timer).full}</span>
                   </div>
                 </div>
               </div>
