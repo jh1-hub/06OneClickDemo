@@ -186,6 +186,18 @@ export default function App() {
                       onClick={() => setStage("PLAYBACK")}
                     >
                       <div className="relative aspect-video bg-black overflow-hidden rounded-t">
+                        <img 
+                          src={`https://images.unsplash.com/photo-${[
+                            "1534528741775-53396c6d2fe5", // Woman portrait
+                            "1524504388940-b1c1722653e1", // Fashion model
+                            "1534751516642-a1af1ef26a56", // Fashion
+                            "1494790108377-be9c29b29330", // Happy young woman
+                            "1531746020798-e795c5394c44", // Woman portrait
+                            "1509060408490-b1d80ec92095"  // Portrait
+                          ][i % 6]}?auto=format&fit=crop&w=400&q=80`}
+                          alt="Thumbnail"
+                          className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"
+                        />
                         {showExplanation && i === 0 && (
                           <div className="absolute inset-0 bg-amber-500/90 z-20 flex items-center justify-center p-4 text-center text-[11px] leading-relaxed">
                             <p className="text-white font-black">
@@ -194,10 +206,10 @@ export default function App() {
                             </p>
                           </div>
                         )}
-                        <div className="absolute inset-0 bg-slate-800 flex items-center justify-center">
-                          <Play className="text-slate-700 group-hover:text-pink-500 transition-colors" size={32} />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <Play className="text-white/40 group-hover:text-pink-500 transition-colors" size={32} />
                         </div>
-                        <span className="absolute bottom-1 right-1 bg-black/70 text-[8px] px-1 font-mono">18:42</span>
+                        <span className="absolute bottom-1 right-1 bg-black/70 text-[8px] px-1 font-mono text-white">18:42</span>
                         <div className="absolute top-1 left-1 bg-gradient-to-r from-red-600 to-pink-600 text-[8px] px-1.5 font-bold italic rounded-sm shadow-lg">PREMIUM</div>
                       </div>
                       <div className="p-2.5">
@@ -218,6 +230,11 @@ export default function App() {
                   className="relative h-28 bg-gradient-to-r from-indigo-900 to-pink-900 rounded-lg overflow-hidden cursor-pointer group border-2 border-indigo-500/30"
                   onClick={() => setStage("PLAYBACK")}
                 >
+                  <img 
+                    src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80" 
+                    alt="Banner" 
+                    className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-50 transition-opacity"
+                  />
                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                     <h3 className="text-lg font-black italic tracking-tighter text-white group-hover:scale-110 transition-transform">
@@ -259,6 +276,11 @@ export default function App() {
             <main className="flex-grow flex flex-col items-center justify-start pt-8 md:pt-16 px-4">
               {/* Video Container */}
               <div className="relative max-w-5xl w-full aspect-video bg-[#0a0a0c] rounded shadow-[0_0_80px_rgba(219,39,119,0.1)] border border-slate-900 group">
+                <img 
+                  src="https://images.unsplash.com/photo-1529139513466-42016c431b63?auto=format&fit=crop&w=1200&q=80" 
+                  alt="Video content" 
+                  className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700"
+                />
                 {/* Fake Controls Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center">
                    <motion.button
