@@ -46,22 +46,30 @@ export default function App() {
     // Detect more accurate OS info
     const ua = navigator.userAgent;
     let os = "不明なOS";
-    if (ua.indexOf("Win") !== -1) os = "Windows";
-    if (ua.indexOf("Mac") !== -1) os = "macOS / iOS";
-    if (ua.indexOf("Android") !== -1) os = "Android";
-    if (ua.indexOf("Linux") !== -1 && ua.indexOf("Android") === -1) os = "Linux";
+    if (ua.indexOf("Windows NT 10.0") !== -1) os = "Windows 10/11";
+    else if (ua.indexOf("Windows NT 6.3") !== -1) os = "Windows 8.1";
+    else if (ua.indexOf("Windows NT 6.2") !== -1) os = "Windows 8";
+    else if (ua.indexOf("Windows NT 6.1") !== -1) os = "Windows 7";
+    else if (ua.indexOf("Mac OS X") !== -1) os = "macOS";
+    else if (ua.indexOf("iPhone") !== -1) os = "iPhone (iOS)";
+    else if (ua.indexOf("iPad") !== -1) os = "iPad (iPadOS)";
+    else if (ua.indexOf("Android") !== -1) {
+      const match = ua.match(/Android\s([0-9\.]+)/);
+      os = match ? `Android ${match[1]}` : "Android OS";
+    }
+    else if (ua.indexOf("Linux") !== -1) os = "Linux";
 
     setSystemInfo({
       userAgent: navigator.userAgent,
-      platform: os + " (" + navigator.platform + ")",
-      language: navigator.language,
+      platform: os,
+      language: navigator.language === "ja" ? "日本語 (ja)" : navigator.language,
       screenRes: `${window.screen.width} x ${window.screen.height}`,
       colorDepth: `${window.screen.colorDepth}-bit`,
       logicalProcessors: navigator.hardwareConcurrency || "4",
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      cookiesEnabled: navigator.cookieEnabled ? "有効" : "無効",
-      referrer: document.referrer || "直接アクセス (または非公開)",
-      browserName: ua.indexOf("Chrome") !== -1 ? "Google Chrome" : ua.indexOf("Firefox") !== -1 ? "Firefox" : ua.indexOf("Safari") !== -1 ? "Safari" : "Other Browser"
+      cookiesEnabled: navigator.cookieEnabled ? "有効 (Enabled)" : "無効 (Disabled)",
+      referrer: document.referrer || "直接アクセス / ブックマーク (Direct)",
+      browserName: ua.indexOf("Edg/") !== -1 ? "Microsoft Edge" : ua.indexOf("Chrome/") !== -1 ? "Google Chrome" : ua.indexOf("Firefox/") !== -1 ? "Firefox" : ua.indexOf("Safari/") !== -1 ? "Safari" : "不明なブラウザ"
     });
   }, []);
 
@@ -403,96 +411,103 @@ export default function App() {
             animate={{ opacity: 1 }}
             className="fixed inset-0 flex items-center justify-center p-4 bg-[#050507] z-[500] overflow-y-auto"
           >
-            <div className="max-w-lg w-full bg-[#111114] rounded-2xl overflow-hidden shadow-[0_0_150px_rgba(219,39,119,0.1)] border border-slate-800 my-auto">
-              <div className="bg-red-700 p-10 text-center relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top,rgba(255,100,100,0.2),transparent)]" />
+            <div className="max-w-2xl w-full bg-[#111114] rounded-2xl overflow-hidden shadow-[0_0_200px_rgba(219,39,119,0.2)] border-2 border-red-900/40 my-auto">
+              <div className="bg-red-700 py-12 px-6 text-center relative overflow-hidden border-b border-red-900/50">
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_top,rgba(255,100,100,0.3),transparent)]" />
                 <motion.div
-                  animate={{ scale: [1, 1.15, 1] }}
-                  transition={{ repeat: Infinity, duration: 1 }}
-                  className="inline-flex items-center justify-center w-24 h-24 bg-white rounded-full text-red-700 mb-6 shadow-[0_0_40px_rgba(255,255,255,0.3)] relative z-10"
+                  animate={{ scale: [1, 1.1, 1], rotate: [0, 2, -2, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                  className="inline-flex items-center justify-center w-28 h-28 bg-white rounded-full text-red-700 mb-8 shadow-[0_0_60px_rgba(255,255,255,0.4)] relative z-10"
                 >
-                  <AlertCircle size={56} />
+                  <AlertCircle size={64} strokeWidth={2.5} />
                 </motion.div>
-                <h2 className="text-3xl font-black text-white relative z-10 tracking-tighter">登録が正式に完了いたしました</h2>
-                <p className="text-red-200 text-[11px] mt-2 relative z-10 font-bold opacity-90 uppercase tracking-widest">Membership Activated (ID: {billingData.id.split('-')[1]})</p>
+                <h2 className="text-4xl md:text-5xl font-black text-white relative z-10 tracking-tighter mb-4">ご登録が完了しました</h2>
+                <p className="text-red-100 text-sm md:text-base relative z-10 font-bold opacity-90 uppercase tracking-[0.2em]">Transaction ID: {billingData.id.split('-')[1]}</p>
               </div>
 
-              <div className="p-8 md:p-12 space-y-8">
+              <div className="p-8 md:p-14 space-y-10">
                 {/* Invoice Details */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-black/40 p-4 rounded-xl border border-slate-800/50">
-                    <p className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1.5">注文番号</p>
-                    <p className="text-slate-100 font-mono text-sm leading-none">{billingData.id}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="bg-black/60 p-6 rounded-xl border border-slate-800/80">
+                    <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2 text-center sm:text-left">管理番号 (Order ID)</p>
+                    <p className="text-slate-100 font-mono text-xl text-center sm:text-left leading-none tracking-tight">{billingData.id}</p>
                   </div>
-                  <div className="bg-black/40 p-4 rounded-xl border border-slate-800/50 text-right">
-                    <p className="text-slate-600 text-[9px] uppercase font-black tracking-widest mb-1.5">登録日時</p>
-                    <p className="text-slate-100 font-mono text-[11px] leading-none">{billingData.time}</p>
-                  </div>
-                </div>
-
-                <div className="text-center py-4 border-y border-slate-800/50">
-                  <p className="text-slate-400 text-[11px] font-bold mb-3">お振込み合計金額をご確認ください</p>
-                  <div className="text-5xl font-black text-white flex items-baseline justify-center gap-1 group">
-                    <span className="text-2xl text-pink-600">￥</span>98,000 <span className="text-xs text-slate-500 font-normal self-end mb-2">(税込)</span>
-                  </div>
-                  <div className="inline-block mt-4 bg-red-600/10 text-red-500 text-[9px] font-black px-4 py-1.5 rounded-full border border-red-900/30 animate-pulse">
-                    ※お支払い期限残り：{formatTimer(timer).split(' ')[1]} {formatTimer(timer).split(' ')[2]}
+                  <div className="bg-black/60 p-6 rounded-xl border border-slate-800/80">
+                    <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest mb-2 text-center sm:text-right">登録日時 (Timestamp)</p>
+                    <p className="text-slate-100 font-mono text-lg text-center sm:text-right leading-none">{billingData.time}</p>
                   </div>
                 </div>
 
-                {/* Intense System Info */}
-                <div className="bg-[#1a1a1e] p-6 rounded-2xl space-y-4 border border-slate-800 relative group">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 className="text-xs font-black text-amber-500 flex items-center gap-2">
-                       <ShieldAlert size={16} /> お客様の環境情報を取得・保存しました
+                <div className="text-center py-8 border-y border-slate-800/50 bg-gradient-to-r from-transparent via-slate-900/30 to-transparent">
+                  <p className="text-slate-400 text-sm font-bold mb-4">請求金額合計 (Initial Payment)</p>
+                  <div className="text-6xl md:text-7xl font-black text-white flex items-baseline justify-center gap-2 group">
+                    <span className="text-3xl text-pink-600">￥</span>98,000 <span className="text-sm text-slate-500 font-normal self-end mb-3">(税込)</span>
+                  </div>
+                  <div className="inline-flex items-center gap-3 mt-6 bg-red-600/20 text-red-500 text-xs font-black px-6 py-2 rounded-full border border-red-900/50 animate-pulse">
+                    <Clock size={14} /> 支払い期限残り：{formatTimer(timer).split(' ')[1]} {formatTimer(timer).split(' ')[2]}
+                  </div>
+                </div>
+
+                {/* Highly Visible System Info */}
+                <div className="bg-[#1a1a1e] p-8 rounded-2xl space-y-6 border border-slate-800 relative group shadow-inner">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <h3 className="text-base font-black text-amber-500 flex items-center gap-3">
+                       <ShieldAlert size={20} className="animate-bounce" /> 端末およびネットワーク情報の記録
                     </h3>
-                    <Smartphone className="text-slate-700 group-hover:text-amber-500 transition-colors" size={20} />
+                    <Monitor className="text-slate-700 group-hover:text-amber-500 transition-colors" size={24} />
                   </div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-[10px] font-mono leading-tight">
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">接続元IPアドレス</p>
-                      <p className="text-amber-200/90">{billingData.ip}</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 text-sm font-mono leading-relaxed">
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">接続元IPアドレス (Your IP)</p>
+                      <p className="text-amber-200 text-lg font-bold underline decoration-amber-500/30">{billingData.ip}</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">使用OS・機種</p>
-                      <p className="text-amber-200/90">{systemInfo.platform}</p>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">現在地候補 / Timezone</p>
+                      <p className="text-amber-200 text-base">{systemInfo.timezone}</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">使用ブラウザ</p>
-                      <p className="text-amber-200/90">{systemInfo.browserName}</p>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">使用デバイス (Detected OS)</p>
+                      <p className="text-amber-100 text-base font-black">{systemInfo.platform}</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">画面設定</p>
-                      <p className="text-amber-200/90">{systemInfo.screenRes} ({systemInfo.colorDepth})</p>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">使用ブラウザ (Browser)</p>
+                      <p className="text-amber-100 text-base">{systemInfo.browserName}</p>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">Cookie設定 / 言語</p>
-                      <p className="text-amber-200/90">{systemInfo.cookiesEnabled} / {systemInfo.language}</p>
+                    <div className="sm:col-span-2 space-y-1.5 bg-black/30 p-4 rounded-lg border border-slate-800/50">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">アクセス経路 (Referrer Info)</p>
+                      <div className="text-indigo-300 text-xs font-bold flex items-center gap-2">
+                        <Globe size={14} className="flex-shrink-0" />
+                        <span className="break-all">{systemInfo.referrer}</span>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <p className="text-slate-600 text-[8px] uppercase font-black">CPUスレッド数</p>
-                      <p className="text-amber-200/90">{systemInfo.logicalProcessors} Threads</p>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">画面解像度</p>
+                      <p className="text-slate-400 text-base">{systemInfo.screenRes} ({systemInfo.colorDepth})</p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-slate-500 text-[10px] uppercase font-black tracking-widest">言語 / Cookie</p>
+                      <p className="text-slate-400 text-base">{systemInfo.language} / {systemInfo.cookiesEnabled}</p>
                     </div>
                   </div>
 
-                  <div className="bg-red-950/40 p-3 rounded-lg text-[9px] text-red-500 font-bold border border-red-900/40">
-                    注意：これらの情報を、電子消費者契約法に基づく「債権回収および法的措置」の証拠として即時にサーバーへ記録しました。
+                  <div className="bg-red-950/60 p-5 rounded-xl text-xs text-red-400 font-bold border border-red-900/60 leading-relaxed shadow-lg">
+                    【警告】当サイトは「電子消費者契約法」に基づき、上記情報を法的手続き（プロバイダへの開示請求および住所特定）の証拠として即時にクラウドサーバーへ保存しました。
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <motion.button 
-                    whileTap={{ scale: 0.98 }}
-                    className="w-full bg-slate-100 text-black py-5 rounded-xl font-black hover:bg-white transition-all shadow-2xl text-sm"
+                    whileTap={{ scale: 0.96 }}
+                    className="w-full bg-slate-100 text-black py-6 rounded-2xl font-black hover:bg-white transition-all shadow-[0_10px_40px_rgba(255,255,255,0.1)] text-lg flex flex-col items-center gap-1"
                     onClick={handlePaymentClick}
                   >
-                    コンビニでの支払い方法を確認する
-                    <p className="text-[9px] font-normal opacity-60">※支払い期限が過ぎると延滞金が発生します</p>
+                    <span>お支払い手続きへ進む</span>
+                    <span className="text-xs font-normal opacity-60">※期限超過後、延滞金および事務手数料が加算されます</span>
                   </motion.button>
-                  <div className="flex justify-center items-center gap-3 py-4">
-                     <Clock size={16} className="text-pink-600" />
-                     <span className="text-xs font-mono font-black text-pink-600 uppercase">TIME REMAINING: {formatTimer(timer)}</span>
+                  <div className="flex justify-center items-center gap-4 py-4 bg-slate-900/30 rounded-xl">
+                     <Clock size={20} className="text-pink-600 animate-pulse" />
+                     <span className="text-sm font-mono font-black text-pink-100 uppercase tracking-widest">支払い期限: {formatTimer(timer)}</span>
                   </div>
                 </div>
               </div>
@@ -523,76 +538,87 @@ export default function App() {
         {stage === "REFLECTION" && (
           <motion.div
             key="reflection"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="fixed inset-0 z-[600] bg-slate-950 overflow-y-auto p-4 md:p-10"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="fixed inset-0 z-[600] bg-[#070709] overflow-y-auto p-6 md:p-16"
           >
-            <div className="max-w-4xl mx-auto space-y-12 pb-20">
-              <header className="text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-600/20 text-green-500 rounded-full mb-4">
-                   <ShieldAlert size={48} />
+            <div className="max-w-5xl mx-auto space-y-16 pb-32">
+              <header className="text-center space-y-6">
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-green-600/10 text-green-500 rounded-2xl mb-4 border border-green-500/20 shadow-[0_0_50px_rgba(34,197,94,0.1)]">
+                   <ShieldAlert size={56} />
                 </div>
-                <h2 className="text-4xl font-black text-white tracking-tighter">【授業用：まとめ】詐欺の手口を振り返る</h2>
-                <p className="text-slate-400">今の恐怖感、焦燥感こそが詐欺師の狙いです。冷静に振り返りましょう。</p>
+                <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter">【学習用まとめ】<br className="md:hidden" />詐欺の手口を振り返る</h2>
+                <p className="text-xl text-slate-400 font-medium max-w-2xl mx-auto leading-relaxed">
+                   「恐怖」「焦燥」「負い目」こそが詐欺師の武器です。<br />
+                   体験した一連の流れを、冷静に分析しましょう。
+                </p>
               </header>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                  {/* Point 1 */}
-                 <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-green-600/50 transition-colors">
-                    <div className="w-12 h-12 bg-indigo-600/20 text-indigo-400 rounded-lg flex items-center justify-center mb-6">
-                       <MousePointer2 size={24} />
+                 <div className="bg-slate-900/40 p-10 rounded-3xl border border-slate-800 hover:border-green-600/40 transition-all duration-500 group shadow-lg">
+                    <div className="w-16 h-16 bg-indigo-600/20 text-indigo-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                       <MousePointer2 size={32} />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">1. クリック一回の重み</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                       最近の詐欺は、再生ボタンそのものに「同意」のリンクを重ねます。さらに、今回のデモのように「確認ダイアログ」を挟むことで、「自分でOKを押した」という心理的な負い目を作り出します。
+                    <h3 className="text-2xl font-black mb-6 text-white tracking-tight">1. 「誘導」と「追認」の巧妙な罠</h3>
+                    <p className="text-base text-slate-400 leading-relaxed">
+                       再生ボタンそのものが「同意」のスイッチになっていました。さらに、年齢確認などで「自分でOKを押した」という事実を積み重ねさせることで、「自分が悪いから払わなければ」という心理的な負い目を植え付けます。
                     </p>
                  </div>
 
                  {/* Point 2 */}
-                 <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-green-600/50 transition-colors">
-                    <div className="w-12 h-12 bg-pink-600/20 text-pink-400 rounded-lg flex items-center justify-center mb-6">
-                       <Calendar size={24} />
+                 <div className="bg-slate-900/40 p-10 rounded-3xl border border-slate-800 hover:border-green-600/40 transition-all duration-500 group shadow-lg">
+                    <div className="w-16 h-16 bg-pink-600/20 text-pink-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                       <Calendar size={32} />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">2. 見えない規約の罠</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                       あえて遥か下にスクロールしなければ見えない場所に規約を置くのは、後で「書いてあった」と言い張るためです。しかし、常識的な範囲で確認できない規約は、契約として認められません。
+                    <h3 className="text-2xl font-black mb-6 text-white tracking-tight">2. 「見えない規約」による既成事実化</h3>
+                    <p className="text-base text-slate-400 leading-relaxed">
+                       通常ではたどり着けないほど下に規約を隠すのは、「書いてあった」という言い訳を作るためです。しかし、法的には容易に確認できない規約は合意とみなされず、契約は不成立（無効）となります。
                     </p>
                  </div>
 
                  {/* Point 3 */}
-                 <div className="bg-slate-900/50 p-8 rounded-2xl border border-slate-800 hover:border-green-600/50 transition-colors">
-                    <div className="w-12 h-12 bg-amber-600/20 text-amber-400 rounded-lg flex items-center justify-center mb-6">
-                       <Monitor size={24} />
+                 <div className="bg-slate-900/40 p-10 rounded-3xl border border-slate-800 hover:border-green-600/40 transition-all duration-500 group shadow-lg">
+                    <div className="w-16 h-16 bg-amber-600/20 text-amber-400 rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                       <Monitor size={32} />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">3. 公開情報の悪用</h3>
-                    <p className="text-sm text-slate-400 leading-relaxed">
-                       IPアドレスやOSなどは、ブラウザがサイトを表示する際に必ず通知する情報です。詐欺師はこれを「あたかも個人を特定した」かのように見せかけます。絶対に一人で悩まず、無視するか専門家へ。
+                    <h3 className="text-2xl font-black mb-6 text-white tracking-tight">3. 「公開情報」を「個人情報」に見せる</h3>
+                    <p className="text-base text-slate-400 leading-relaxed">
+                       IPアドレスやOS情報は、ブラウザがサイトを表示するために自動で送信する公開データです。詐欺師はこれを表示することで「正体を完全に特定した」と錯覚させます。これだけで住所や氏名がバレることはありません。
                     </p>
                  </div>
 
                  {/* Point 4 */}
-                 <div className="bg-slate-100 text-slate-900 p-8 rounded-2xl border border-white">
-                    <h3 className="text-xl font-black mb-4">被害に遭った時のアクション</h3>
-                    <ul className="space-y-4">
-                       <li className="flex items-start gap-2">
-                         <ArrowRightCircle className="mt-1 flex-shrink-0" size={16} />
+                 <div className="bg-white text-slate-950 p-10 rounded-3xl shadow-[0_20px_50px_rgba(255,255,255,0.05)] border border-white/20">
+                    <h3 className="text-2xl font-black mb-8 flex items-center gap-3">
+                       <ShieldAlert className="text-red-600" /> 被害に遭った時のアクション
+                    </h3>
+                    <ul className="space-y-6">
+                       <li className="flex items-start gap-4">
+                         <div className="mt-1.5 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <ArrowRightCircle className="text-red-600" size={16} />
+                         </div>
                          <div>
-                            <p className="font-bold">絶対に連絡・支払いをしない</p>
-                            <p className="text-xs opacity-70">一度払うと「カモ」としてさらに請求されます。</p>
+                            <p className="text-lg font-black tracking-tight">絶対に連絡・支払いをしない</p>
+                            <p className="text-sm opacity-70 mt-1 leading-relaxed">一度でも払うと「カモ」として認識され、さらなる高額請求のリストに載ってしまいます。</p>
                          </div>
                        </li>
-                       <li className="flex items-start gap-2">
-                         <ArrowRightCircle className="mt-1 flex-shrink-0" size={16} />
+                       <li className="flex items-start gap-4">
+                         <div className="mt-1.5 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <ArrowRightCircle className="text-blue-600" size={16} />
+                         </div>
                          <div>
-                            <p className="font-bold">消費者ホットライン「188」に相談</p>
-                            <p className="text-xs opacity-70">公的な窓口で適切なアドバイスが受けられます。</p>
+                            <p className="text-lg font-black tracking-tight">消費者ホットライン「188」に相談</p>
+                            <p className="text-sm opacity-70 mt-1 leading-relaxed">最寄りの消費生活センターにつながります。法的アドバイスを無料で受けることが可能です。</p>
                          </div>
                        </li>
-                       <li className="flex items-start gap-2">
-                         <ArrowRightCircle className="mt-1 flex-shrink-0" size={16} />
+                       <li className="flex items-start gap-4">
+                         <div className="mt-1.5 w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0">
+                            <ArrowRightCircle className="text-slate-600" size={16} />
+                         </div>
                          <div>
-                            <p className="font-bold">スクリーンショットのみ残して無視</p>
-                            <p className="text-xs opacity-70">証拠として保存し、ブラウザを閉じましょう。</p>
+                            <p className="text-lg font-black tracking-tight">無視してブラウザを閉じる</p>
+                            <p className="text-sm opacity-70 mt-1 leading-relaxed">請求画面が出続ける場合は、ブラウザのキャッシュを削除するかタブを閉じるだけで解決します。</p>
                          </div>
                        </li>
                     </ul>
@@ -602,9 +628,9 @@ export default function App() {
               <div className="text-center pt-10">
                 <button 
                    onClick={() => { setStage("PORTAL"); setPaymentClickCount(0); setShowConfirmBox(false); }}
-                   className="bg-slate-800 hover:bg-slate-700 text-white px-10 py-4 rounded-full font-bold transition-all"
+                   className="bg-slate-800 hover:bg-slate-700 hover:scale-105 active:scale-95 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all shadow-xl border border-slate-700"
                 >
-                  最初に戻って再体験する
+                  トップページに戻って再体験する
                 </button>
               </div>
             </div>
