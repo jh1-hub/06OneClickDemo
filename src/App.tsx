@@ -165,13 +165,26 @@ export default function App() {
                           <span className={`text-xl font-black italic ${i <= 3 ? 'text-pink-500' : 'text-slate-700'}`}>{i}</span>
                           <div className="flex-grow">
                              <p className="text-[10px] font-bold line-clamp-2 leading-tight group-hover:text-pink-400 transition-colors">
-                               深夜の放送事故！あの人気モデルが自宅で...
+                               {i === 1 ? "深夜の放送事故！あの人気モデルが自宅で..." : i === 2 ? "【流出】大手企業の受付嬢、秘密の放課後" : "絶対に見てはいけない禁断の10秒間"}
                              </p>
-                             <p className="text-[8px] text-slate-600 mt-1">32,941 views</p>
+                             <p className="text-[8px] text-slate-600 mt-1">{(120 - i * 10).toLocaleString()} views</p>
                           </div>
                         </div>
                       ))}
                    </div>
+                </div>
+
+                {/* Shady Sidebar Ad */}
+                <div className="bg-gradient-to-br from-amber-600/20 to-red-600/20 border border-amber-500/30 rounded p-4 cursor-pointer hover:from-amber-600/30 transition-all">
+                   <div className="flex items-center gap-2 mb-2">
+                     <Zap size={14} className="text-amber-500" fill="currentColor" />
+                     <span className="text-[10px] font-black text-amber-500">SPONSORED</span>
+                   </div>
+                   <p className="text-[11px] font-bold text-white mb-2 leading-tight">
+                     スマホ1台で月収50万円！？<br/>
+                     知識不要の次世代副業を今すぐチェック
+                   </p>
+                   <button className="w-full bg-amber-600 text-white text-[9px] font-black py-1 rounded">詳細を見る</button>
                 </div>
               </aside>
 
@@ -209,16 +222,16 @@ export default function App() {
                         <div className="absolute inset-0 flex items-center justify-center">
                           <Play className="text-white/40 group-hover:text-pink-500 transition-colors" size={32} />
                         </div>
-                        <span className="absolute bottom-1 right-1 bg-black/70 text-[8px] px-1 font-mono text-white">18:42</span>
+                        <span className="absolute bottom-1 right-1 bg-black/70 text-[8px] px-1 font-mono text-white tracking-widest">{10 + i}:{20 + i}</span>
                         <div className="absolute top-1 left-1 bg-gradient-to-r from-red-600 to-pink-600 text-[8px] px-1.5 font-bold italic rounded-sm shadow-lg">PREMIUM</div>
                       </div>
                       <div className="p-2.5">
                         <p className="text-[11px] font-black leading-tight line-clamp-2 min-h-[2.2rem] group-hover:text-pink-400">
-                          {i % 2 === 0 ? "【衝撃映像】街角で声をかけた女子大生がまさかの展開に..." : "絶対に笑ってはいけない深夜のハプニングまとめ100連発！"}
+                          {i % 3 === 0 ? "【衝撃映像】街角で声をかけた女子大生がまさかの展開に..." : i % 3 === 1 ? "絶対に笑ってはいけない深夜のハプニングまとめ100連発！" : "【独占】元アイドルMの極秘ビデオが流出！？"}
                         </p>
                         <div className="flex justify-between items-center text-[8px] text-slate-500 mt-2">
                           <span className="flex items-center gap-1"><Monitor size={8} /> 4k Ultra HD</span>
-                          <span className="bg-slate-800 px-1 rounded italic text-slate-400">#Ch.{i + 1}</span>
+                          <span className="text-slate-400">{(i + 1) * 2}日前 ｜ {(i + 1) * 4.2}k view</span>
                         </div>
                       </div>
                     </motion.div>
