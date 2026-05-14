@@ -596,30 +596,30 @@ export default function App() {
                     <div className="sm:col-span-2 mt-4 space-y-4">
                       <div className="bg-black/80 p-6 rounded-xl border border-red-900/30 font-mono text-[9px] text-slate-400 overflow-x-auto leading-relaxed">
                         <p className="text-red-500 font-black mb-3 text-xs border-b border-red-900/40 pb-1">SERVER_ENVIRONMENT_DUMP</p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">REMOTE_HOST:</span>
+                        <div className="grid grid-cols-1 gap-y-1">
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2 border-b border-slate-900 pb-1">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">REMOTE_HOST:</span>
                              <span className="text-amber-100/60 break-all">{systemInfo.remoteHost}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">REMOTE_ADDR:</span>
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2 border-b border-slate-900 pb-1">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">REMOTE_ADDR:</span>
                              <span className="text-amber-200 font-bold">{billingData.ip}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_REFERER:</span>
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2 border-b border-slate-900 pb-1">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">HTTP_REFERER:</span>
                              <span className="text-slate-500 break-all">{systemInfo.httpReferer}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_USER_AGENT:</span>
-                             <span className="text-slate-500 italic break-all truncate">{systemInfo.httpUserAgent}</span>
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2 border-b border-slate-900 pb-1">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">HTTP_USER_AGENT:</span>
+                             <span className="text-slate-500 italic break-all">{systemInfo.httpUserAgent}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_ACCEPT_LANG:</span>
-                             <span className="text-slate-500">{systemInfo.httpAcceptLanguage}</span>
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2 border-b border-slate-900 pb-1">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">HTTP_ACCEPT_LANG:</span>
+                             <span className="text-slate-500 break-all">{systemInfo.httpAcceptLanguage}</span>
                           </div>
-                          <div className="flex gap-2">
-                             <span className="text-indigo-400/80 min-w-[140px] flex-shrink-0">HTTP_SEC_CH_UA:</span>
-                             <span className="text-slate-500">{systemInfo.httpSecChUa}</span>
+                          <div className="flex flex-col sm:flex-row gap-0 sm:gap-2">
+                             <span className="text-indigo-400/80 min-w-[120px] flex-shrink-0">HTTP_SEC_CH_UA:</span>
+                             <span className="text-slate-500 break-all">{systemInfo.httpSecChUa}</span>
                           </div>
                         </div>
                         <p className="mt-4 text-[8px] text-red-500/50 italic font-bold">※これらのヘッダー情報は、サーバーとの接続時に自動的にログへ記録されています。</p>
